@@ -11,26 +11,29 @@
 
     // Define the plugin
     $.fn.ezBgResize = function(options) {
-		
+
 		// Set global to obj passed
 		jqez = options;
-		
+
 		// If img option is string convert to array.
 		// This is in preparation for accepting an slideshow of images.
 		if (!$.isArray(jqez.img)) {
 			var tmp_img = jqez.img;
 			jqez.img = [tmp_img]
 		}
-		
-		$("<img/>").attr("src", jqez.img).load(function() {
+
+		$("<img/>").load(function() {
 			jqez.width = this.width;
 			jqez.height = this.height;
-			
+
 			// Create a unique div container
-			$("body").append('<div id="jq_ez_bg"></div>');
+			if ($("#jq_ez_bg").length==0)
+			{
+				$("body").append('<div id="jq_ez_bg"></div>');
+			}
 
 			// Add the image to it.
-			$("#jq_ez_bg").html('<img src="' + jqez.img[0] + '" width="' + jqez.width + '" height="' + jqez.height + '" border="0">');
+			$("#jq_ez_bg").append('<img src="' + $(this).attr('src') + '" width="' + jqez.width + '" height="' + jqez.height + '" border="0">');
 
 			// First position object
 	        $("#jq_ez_bg").css("visibility","hidden");
@@ -41,16 +44,40 @@
 	        });
 
 			resizeImage();
-		});
+
+			if (jqez.img.length>1)
+			{
+				// translate to next image.
+				if ($('#jq_ez_bg').children().length>0)
+				{
+					$('#jq_ez_bg').children().last().css({"opacity":0,'position':'absolute'}).animate({"opacity":1}, 800, 'linear',function(){$(this).css({'position':'relative'})}).siblings("img").animate({"opacity":0}, 800, 'linear',function(){$(this).remove()});
+				}
+
+				var _this = this;
+				setTimeout(function(){
+					while (true)
+					{
+						console.log('xxx');
+						var img = jqez.img[Math.floor(Math.random()*jqez.img.length)];
+						if (img != $(_this).attr('src'))
+						{
+							 $(_this).attr('src',img);
+							break;
+						}
+					}
+				},8000);
+			}
+
+		}).attr("src", jqez.img[0]);
     };
 
 	$(window).bind("resize", function() {
 		resizeImage();
 	});
-	
+
 	// Actual resize function
     function resizeImage() {
-	
+
         $("#jq_ez_bg").css({
             "position":"fixed",
             "top":"0px",
@@ -61,14 +88,14 @@
             "height":$(window).height() + "px",
 			"opacity" : jqez.opacity
         });
-		
+
 		// Image relative to its container
 		$("#jq_ez_bg").children('img').css("position", "relative");
 
         // Resize the img object to the proper ratio of the window.
         var iw = $("#jq_ez_bg").children('img').width();
         var ih = $("#jq_ez_bg").children('img').height();
-        
+
         if ($(window).width() > $(window).height()) {
             //console.log(iw, ih);
             if (iw > ih) {
@@ -93,7 +120,7 @@
             $("#jq_ez_bg").children('img').css("height",$(window).height());
             $("#jq_ez_bg").children('img').css("width",Math.round($(window).height() * (1/fRatio)));
         }
-		
+
 		// Center the image
 		if (typeof(jqez.center) == 'undefined' || jqez.center) {
 			if ($("#jq_ez_bg").children('img').width() > $(window).width()) {
@@ -120,7 +147,7 @@
 		$("body").css({
             "overflow":"auto"
         });
-		
-        
+
+
     }
 })(jQuery);

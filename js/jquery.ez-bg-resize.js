@@ -50,22 +50,21 @@
 				// translate to next image.
 				if ($('#jq_ez_bg').children().length>0)
 				{
-					$('#jq_ez_bg').children().last().css({"opacity":0,'position':'absolute'}).animate({"opacity":1}, 800, 'linear',function(){$(this).css({'position':'relative'})}).siblings("img").animate({"opacity":0}, 800, 'linear',function(){$(this).remove()});
+					$('#jq_ez_bg').children().last().hide(0).fadeIn().siblings("img").fadeOut(function(){$(this).remove()});
 				}
 
 				var _this = this;
 				setTimeout(function(){
 					while (true)
 					{
-						console.log('xxx');
 						var img = jqez.img[Math.floor(Math.random()*jqez.img.length)];
 						if (img != $(_this).attr('src'))
 						{
-							 $(_this).attr('src',img);
+							$(_this).attr('src',img);
 							break;
 						}
 					}
-				},8000);
+				},options['delay']?options['delay']:8000);
 			}
 
 		}).attr("src", jqez.img[0]);
@@ -90,7 +89,7 @@
         });
 
 		// Image relative to its container
-		$("#jq_ez_bg").children('img').css("position", "relative");
+		$("#jq_ez_bg").children('img').css("position", "absolute");
 
         // Resize the img object to the proper ratio of the window.
         var iw = $("#jq_ez_bg").children('img').width();
